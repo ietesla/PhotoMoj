@@ -1,0 +1,23 @@
+{
+  "name": "photomoj",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PhotoMoj: a simple photo editor for web and phone (proof of concept).",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "npm run build && node server/index.js",
+    "serve": "node server/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "vite": "^8.3.8",
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.1.0"
+  }
+}

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1B1F2A" />
+    <meta name="description" content="PhotoMoj: fix a photo and grab its colors. Works in your browser, no account." />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <title>PhotoMoj</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <!-- Import screen -->
+      <section id="import-screen" class="screen" aria-labelledby="app-title">
+        <h1 id="app-title">PhotoMoj</h1>
+        <p class="tagline">A little edit. A lot of you.</p>
+        <label class="btn btn-primary" for="file-input">Choose a photo</label>
+        <input id="file-input" type="file" accept="image/*" hidden />
+        <p id="import-error" class="error" role="alert" hidden></p>
+
+        <div class="actions">
+          <button id="camera-btn" class="btn btn-secondary" type="button">Take a photo</button>
+          <button id="install-btn" class="btn btn-secondary" type="button" hidden>Install as an app</button>
+        </div>
+        <p id="install-hint" class="hint" hidden></p>
+      </section>
+
+      <!-- Camera screen -->
+      <section id="camera-screen" class="screen" hidden aria-label="Camera">
+        <div class="viewfinder">
+          <video id="camera-video" autoplay playsinline muted></video>
+        </div>
+        <p id="camera-status" class="status" role="status"></p>
+        <div class="actions">
+          <button id="shutter-btn" class="btn btn-primary" type="button" disabled>Take photo</button>
+          <button id="flip-btn" class="btn btn-secondary" type="button">Switch camera</button>
+          <button id="camera-cancel-btn" class="btn btn-secondary" type="button">Cancel</button>
+        </div>
+      </section>
+
+      <!-- Editor screen -->
+      <section id="editor-screen" class="editor" hidden aria-label="Editor">
+        <header class="topbar">
+          <div class="brand">
+            <span class="brand-name">PhotoMoj</span>
+            <span class="brand-tag">A little edit. A lot of you.</span>
+          </div>
+          <div class="topbar-actions">
+            <button id="back-import-btn" class="btn-top btn-top-quiet" type="button">Back to import</button>
+            <button id="export-btn" class="btn-top btn-top-primary" type="button">Export</button>
+          </div>
+        </header>
+
+        <div class="workspace">
+          <nav class="rail" role="tablist" aria-label="Tools" aria-orientation="vertical">
+            <button id="tab-adjust" class="tab" role="tab" type="button" aria-selected="true" aria-controls="adjust-panel">
+              <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h9M17 8h3M4 16h3M11 16h9"/><circle cx="15" cy="8" r="2"/><circle cx="9" cy="16" r="2"/></svg>
+              <span>Adjust</span>
+            </button>
+            <button id="tab-filters" class="tab" role="tab" type="button" aria-selected="false" aria-controls="filters-panel">
+              <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7z"/></svg>
+              <span>Filters</span>
+            </button>
+            <button id="tab-palette" class="tab" role="tab" type="button" aria-selected="false" aria-controls="palette-panel">
+              <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 10v10"/></svg>
+              <span>Palette</span>
+            </button>
+          </nav>
+
+          <section class="tool-panel">
+            <div id="adjust-panel" class="tool" role="tabpanel" aria-labelledby="tab-adjust">
+              <h2>Adjust</h2>
+              <p class="tool-sub">Find your light. Keep it natural.</p>
+              <div id="sliders" class="sliders"></div>
+            </div>
+
+            <div id="filters-panel" class="tool" role="tabpanel" aria-labelledby="tab-filters" hidden>
+              <h2>Filters</h2>
+              <p class="tool-sub">A little mood. Still your photo.</p>
+              <div id="filter-grid" class="filter-grid" role="radiogroup" aria-label="Filters"></div>
+              <div id="strength-block" class="strength-block"></div>
+            </div>
+
+            <div id="palette-panel" class="tool" role="tabpanel" aria-labelledby="tab-palette" hidden>
+              <h2>Palette</h2>
+              <p class="tool-sub">Five colors from your photo.</p>
+              <div id="swatches" class="swatches"></div>
+              <div id="gradient-bar" class="gradient-bar" role="img" aria-label="Gradient built from the colors in your photo"></div>
+              <p class="hint">Tap a color to copy its code.</p>
+              <p id="copy-status" class="toast" role="status"></p>
+            </div>
+
+            <div id="panel-actions" class="panel-actions">
+              <button id="cancel-btn" class="btn-panel btn-panel-quiet" type="button" disabled>Cancel changes</button>
+              <button id="confirm-btn" class="btn-panel btn-panel-primary" type="button" disabled>Confirm changes</button>
+            </div>
+          </section>
+
+          <section class="canvas-area">
+            <div class="toolbar" role="toolbar" aria-label="Edit history">
+              <button id="undo-btn" class="btn-tool" type="button" disabled>
+                <svg class="btn-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7 4 12l5 5M4 12h10a6 6 0 0 1 6 6"/></svg>Undo
+              </button>
+              <button id="redo-btn" class="btn-tool" type="button" disabled>
+                <svg class="btn-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 7 5 5-5 5M20 12H10a6 6 0 0 0-6 6"/></svg>Redo
+              </button>
+              <button id="reset-btn" class="btn-tool" type="button" disabled>
+                <svg class="btn-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4.5h4.5"/></svg>Reset
+              </button>
+              <span id="photo-name" class="photo-name"></span>
+            </div>
+
+            <div class="stage-wrap">
+              <div class="stage">
+                <canvas id="photo-canvas" aria-label="Your photo"></canvas>
+              </div>
+              <div class="zoom-bar" role="group" aria-label="Zoom the preview">
+                <button id="zoom-out-btn" class="zoom-btn" type="button" aria-label="Zoom out" disabled>&minus;</button>
+                <output id="zoom-readout" class="zoom-readout" aria-live="polite">1x</output>
+                <button id="zoom-in-btn" class="zoom-btn" type="button" aria-label="Zoom in">+</button>
+                <button id="zoom-fit-btn" class="zoom-btn zoom-fit" type="button" disabled>Fit</button>
+              </div>
+            </div>
+
+            <div class="caption">
+              <span id="preview-caption">Preview</span>
+              <span id="photo-info"></span>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- Export screen -->
+      <section id="export-screen" class="screen" hidden aria-labelledby="export-title">
+        <h2 id="export-title">Export</h2>
+        <fieldset class="formats">
+          <legend>File type</legend>
+          <label class="format">
+            <input type="radio" name="format" value="jpg" checked />
+            <span>JPG</span>
+          </label>
+          <label class="format">
+            <input type="radio" name="format" value="png" />
+            <span>PNG</span>
+          </label>
+        </fieldset>
+        <p class="hint">JPG makes a smaller file. PNG keeps every pixel exact.</p>
+        <div class="actions">
+          <button id="save-btn" class="btn btn-primary" type="button">Export</button>
+          <button id="share-btn" class="btn btn-secondary" type="button" hidden>Share</button>
+          <button id="back-btn" class="btn btn-secondary" type="button">Back to editing</button>
+        </div>
+        <p id="export-status" class="status" role="status"></p>
+      </section>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
